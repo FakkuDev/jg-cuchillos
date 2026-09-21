@@ -1,26 +1,10 @@
 [
   {
-    "id": "trabajo-1",
-    "nombre": "Juego de asado",
-    "foto": "trabajo-1.webp",
-    "descripcion": "Cuchillo y tenedor para asado",
+    "id": "cuchillocampero-1",
+    "nombre": "Cuchillo Campero",
+    "foto": "cuchillocampero.webp",
     "orden": 1,
-    "activo": true
-  },
-  {
-    "id": "trabajo-2",
-    "nombre": "Facon personalizado",
-    "foto": "trabajo-2.webp",
-    "descripcion": "Cabo de asta de ciervo",
-    "orden": 2,
-    "activo": true
-  },
-  {
-    "id": "trabajo-3",
-    "nombre": "Set de cocina",
-    "foto": "trabajo-3.webp",
-    "descripcion": "Tres piezas damasco",
-    "orden": 3,
-    "activo": true
+    "activo": true,
+    "descripcion": "Realizado en Acero al Carbono 1070 Virgen, terminación satinado a mano. Cachas de micarta en tono verde oliva, negro y separadores de color blanco. Sujetas mediante 2 pines de latón de 4 mm y un pin mosaico central a modo decorativo. Viene un una vaina en cuero vaqueta teñida y cosida a mano. \n\n- Medidas del cuchillo: Largo de Hoja (15 cm), Ancho (30 mm), Espesor (3 mm), Cabo (11 cm) y Filo Gillette "
   }
 ]
