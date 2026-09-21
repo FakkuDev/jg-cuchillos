@@ -1,0 +1,96 @@
+---
+import { siteConfig } from "../config/site";
+---
+
+<footer class="bg-dark text-cream/80 py-12 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+            <h3 class="font-serif text-xl text-cream mb-4">
+                {siteConfig.name}
+            </h3>
+            <p class="text-sm mb-2">{siteConfig.direccion}</p>
+            <p class="text-sm mb-4">{siteConfig.horarios}</p>
+            <div class="flex gap-4">
+                <a
+                    href={siteConfig.instagram}
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Instagram"
+                    class="hover:text-cognac transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect
+                            x="2"
+                            y="2"
+                            width="20"
+                            height="20"
+                            rx="5"
+                            ry="5"
+                        ></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a
+                    href={siteConfig.facebook}
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Facebook"
+                    class="hover:text-cognac transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="font-serif text-lg text-cream mb-4">Envíos y Retiros</h4>
+            <ul class="text-sm space-y-2">
+                <li>Envíos a todo el país (coordinado por WhatsApp).</li>
+                <li>Retiro en el taller con cita previa.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="font-serif text-lg text-cream mb-4">Contacto</h4>
+            <ul class="text-sm space-y-2">
+                <li>
+                    WhatsApp:{" "}
+                    <a
+                        href={`https://wa.me/${siteConfig.whatsapp}`}
+                        class="hover:text-cognac"
+                    >
+                        +{siteConfig.whatsapp}
+                    </a>
+                </li>
+                <li>Email: {siteConfig.email}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-8 border-t border-cream/10 text-center text-xs text-cream/50">
+        © {new Date().getFullYear()} {siteConfig.name}. Todos los derechos
+        reservados.
+    </div>
+</footer>

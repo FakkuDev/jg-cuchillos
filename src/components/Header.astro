@@ -1,0 +1,111 @@
+---
+import { siteConfig } from "../config/site";
+---
+
+<header class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-charcoal/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <a
+                href="/"
+                class="font-serif text-2xl font-semibold text-charcoal tracking-wide"
+            >
+                {siteConfig.name}
+            </a>
+
+            <nav class="hidden md:flex gap-8">
+                <a
+                    href="#productos"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Productos
+                </a>
+                <a
+                    href="#galeria"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Trabajos realizados
+                </a>
+                <a
+                    href="#info"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Información útil
+                </a>
+                <a
+                    href="#comprar"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Cómo comprar
+                </a>
+                <a
+                    href="#contacto"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Contacto
+                </a>
+                <a
+                    href="#taller"
+                    class="text-sm font-medium text-charcoal hover:text-cognac transition-colors"
+                >
+                    Taller
+                </a>
+            </nav>
+
+            <button
+                id="mobile-menu-btn"
+                class="md:hidden p-2 text-charcoal"
+                aria-label="Abrir menú"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-cream border-b border-charcoal/10 absolute w-full"
+    >
+        <nav class="flex flex-col p-4 gap-4">
+            <a href="#productos" class="text-base font-medium text-charcoal">
+                Productos
+            </a>
+            <a href="#galeria" class="text-base font-medium text-charcoal">
+                Trabajos realizados
+            </a>
+            <a href="#info" class="text-base font-medium text-charcoal">
+                Información útil
+            </a>
+            <a href="#comprar" class="text-base font-medium text-charcoal">
+                Cómo comprar
+            </a>
+            <a href="#contacto" class="text-base font-medium text-charcoal">
+                Contacto
+            </a>
+            <a href="#taller" class="text-base font-medium text-charcoal">
+                Taller
+            </a>
+        </nav>
+    </div>
+</header>
+
+<script>
+    const btn = document.getElementById("mobile-menu-btn");
+    const menu = document.getElementById("mobile-menu");
+    btn?.addEventListener("click", () => {
+        menu?.classList.toggle("hidden");
+    });
+</script>

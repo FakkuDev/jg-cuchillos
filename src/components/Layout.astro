@@ -1,0 +1,48 @@
+---
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '../styles/global.css';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import WhatsAppFloat from './WhatsAppFloat.astro';
+import { siteConfig } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, any>;
+}
+
+const { title, description, jsonLd } = Astro.props;
+const fullTitle = `${title} | ${siteConfig.name}`;
+const canonical = `${siteConfig.url}${Astro.url.pathname}`;
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppFloat />
+  </body>
+</html>

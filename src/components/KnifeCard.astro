@@ -1,0 +1,57 @@
+---
+import { resolveImage } from "../lib/imageHelper";
+import { siteConfig } from "../config/site";
+
+export interface Props {
+    cuchillo: any;
+}
+
+const { cuchillo } = Astro.props;
+const imagen = resolveImage(
+    "cuchillos",
+    cuchillo.fotos[0] || "placeholder.webp",
+);
+const precioFormateado = cuchillo.precio
+    ? new Intl.NumberFormat("es-AR", {
+          style: "currency",
+          currency: "ARS",
+          maximumFractionDigits: 0,
+      }).format(cuchillo.precio)
+    : "Consultar";
+
+const waText = encodeURIComponent(
+    `Hola, me interesa el cuchillo ${cuchillo.nombre}.`,
+);
+const waLink = `https://wa.me/${siteConfig.whatsapp}?text=${waText}`;
+---
+
+<a
+    href={`/cuchillos/${cuchillo.id}/`}
+    class="knife-card-link group block bg-white rounded-lg border border-charcoal/10 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 content-visibility-auto"
+    data-estado={cuchillo.estado}
+    data-acero={cuchillo.acero.toLowerCase()}
+    data-cabo={cuchillo.cabo.toLowerCase()}
+    data-terminacion={cuchillo.terminacion.toLowerCase()}
+>
+    <div class="aspect-square bg-cream relative overflow-hidden">
+        <img
+            src={imagen}
+            alt={cuchillo.nombre}
+            width="400"
+            height="400"
+            loading="lazy"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        {cuchillo.destacado && (
+            <span class="absolute top-2 right-2 bg-cognac text-cream text-xs font-bold px-2 py-1 rounded-full">
+                Destacado
+            </span>
+        )}
+    </div>
+    <div class="p-4 text-center">
+        <h3 class="font-serif text-lg font-semibold text-charcoal uppercase tracking-wide mb-1">
+            {cuchillo.nombre}
+        </h3>
+        <p class="text-cognac font-medium">{precioFormateado}</p>
+    </div>
+</a>

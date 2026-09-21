@@ -1,0 +1,5 @@
+[
+  { "id": "trabajo-1", "nombre": "Juego de asado", "foto": "trabajo-1.webp", "descripcion": "Cuchillo y tenedor para asado", "orden": 1, "activo": true },
+  { "id": "trabajo-2", "nombre": "Facon personalizado", "foto": "trabajo-2.webp", "descripcion": "Cabo de asta de ciervo", "orden": 2, "activo": true },
+  { "id": "trabajo-3", "nombre": "Set de cocina", "foto": "trabajo-3.webp", "descripcion": "Tres piezas damasco", "orden": 3, "activo": true }
+]

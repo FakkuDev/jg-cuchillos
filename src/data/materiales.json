@@ -1,0 +1,7 @@
+[
+  { "categoria": "Acero", "nombre": "N690", "nota": "Acero inoxidable austriaco, gran tenacidad.", "disponible": true },
+  { "categoria": "Acero", "nombre": "80CrV2", "nota": "Acero al carbono de alto rendimiento, fácil afilado.", "disponible": true },
+  { "categoria": "Cabo", "nombre": "Guayubira", "nota": "Madera nativa, densa y resistente a la humedad.", "disponible": true },
+  { "categoria": "Cabo", "nombre": "Micarta", "nota": "Material sintético, agarre seguro en mojado.", "disponible": true },
+  { "categoria": "Terminación", "nombre": "Satín", "nota": "Acabado fino, protege contra reflejos.", "disponible": true }
+]

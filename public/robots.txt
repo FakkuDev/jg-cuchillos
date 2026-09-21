@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://URL_FINAL_DEL_SITIO/sitemap-index.xml
