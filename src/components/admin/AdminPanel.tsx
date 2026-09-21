@@ -3,7 +3,6 @@ import { useState, useEffect } from 'preact/hooks';
 import ExcelManager from './ExcelManager';
 import PhotoManager from './PhotoManager';
 import SingleEditor from './SingleEditor';
-import PreviewChanges from './PreviewChanges';
 import { GitHubClient } from '../../lib/admin/github';
 
 interface Props {
@@ -20,7 +19,12 @@ export default function AdminPanel({ currentData }: Props) {
   const [data, setData] = useState(currentData);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [editingType, setEditingType] = useState<any>(null);
-  const [photos, setPhotos] = useState<{ name: string; blob: Blob }[]>([]);
+
+  // Fotos separadas por sección
+  const [photosCuchillos, setPhotosCuchillos] = useState<{ name: string; blob: Blob }[]>([]);
+  const [photosGaleria, setPhotosGaleria] = useState<{ name: string; blob: Blob }[]>([]);
+  const [photosTaller, setPhotosTaller] = useState<{ name: string; blob: Blob }[]>([]);
+
   const [pendingChanges, setPendingChanges] = useState<any>(null);
   const [status, setStatus] = useState('');
 
@@ -29,17 +33,20 @@ export default function AdminPanel({ currentData }: Props) {
   const repo = import.meta.env.PUBLIC_GITHUB_REPO || 'jg-cuchillos';
   const branch = import.meta.env.PUBLIC_GITHUB_BRANCH || 'main';
 
-  // Calcular cambios pendientes comparando con los datos iniciales
+  // Calcular cambios pendientes
   useEffect(() => {
     const changes = {
       new: 0,
       updated: 0,
       hidden: 0,
       deleted: 0,
-      newPhotos: photos.length,
+      newPhotos: photosCuchillos.length + photosGaleria.length + photosTaller.length,
     };
 
-    const hasChanges = JSON.stringify(data) !== JSON.stringify(currentData) || photos.length > 0;
+    const hasChanges = JSON.stringify(data) !== JSON.stringify(currentData) ||
+                       photosCuchillos.length > 0 ||
+                       photosGaleria.length > 0 ||
+                       photosTaller.length > 0;
 
     if (hasChanges) {
       // Cuchillos
@@ -97,7 +104,7 @@ export default function AdminPanel({ currentData }: Props) {
     } else {
       setPendingChanges(null);
     }
-  }, [data, photos]);
+  }, [data, photosCuchillos, photosGaleria, photosTaller]);
 
   const handleValidData = (newData: any) => {
     setData(newData);
@@ -128,10 +135,6 @@ export default function AdminPanel({ currentData }: Props) {
     setStatus(`🗑️ Item eliminado. Andá a la pestaña Excel para publicar.`);
   };
 
-  const handlePhotosReady = (files: { name: string; blob: Blob }[]) => {
-    setPhotos(files);
-  };
-
   const handlePublish = async () => {
     if (!pendingChanges) return;
     if (!confirm('¿Publicar cambios? Esto creará un commit en GitHub.')) return;
@@ -146,8 +149,16 @@ export default function AdminPanel({ currentData }: Props) {
           path: f.path,
           content: typeof f.content === 'string' ? f.content : ''
         })),
-        ...photos.map(p => ({
-          path: `src/assets/cuchillos/${p.name}`,
+        ...photosCuchillos.map(p => ({
+          path: `public/cuchillos/${p.name}`,
+          content: p.blob
+        })),
+        ...photosGaleria.map(p => ({
+          path: `public/galeria/${p.name}`,
+          content: p.blob
+        })),
+        ...photosTaller.map(p => ({
+          path: `public/taller/${p.name}`,
           content: p.blob
         })),
       ];
@@ -157,7 +168,9 @@ export default function AdminPanel({ currentData }: Props) {
       if (result.success && result.commitUrl) {
         setStatus(`✅ Publicado con éxito. Cloudflare reconstruirá el sitio en 1-2 minutos.`);
         setPendingChanges(null);
-        setPhotos([]);
+        setPhotosCuchillos([]);
+        setPhotosGaleria([]);
+        setPhotosTaller([]);
       } else {
         setStatus(`❌ Error: ${result.error}`);
       }
@@ -197,11 +210,6 @@ export default function AdminPanel({ currentData }: Props) {
       {activeTab === 'excel' && (
         <div class="panel active">
           <ExcelManager currentData={data} onValidData={handleValidData} />
-
-          <div style="margin-top: 30px;">
-            <h3 style="font-size: 18px; margin-bottom: 15px;">Gestión de Fotos</h3>
-            <PhotoManager onFilesReady={handlePhotosReady} existingFiles={[]} />
-          </div>
 
           {pendingChanges && (
             <div style="margin-top: 30px;">
@@ -254,6 +262,15 @@ export default function AdminPanel({ currentData }: Props) {
             />
           ) : (
             <>
+              <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Gestión de Fotos - Cuchillos</h3>
+                <PhotoManager
+                  onFilesReady={setPhotosCuchillos}
+                  existingFiles={data.cuchillos.flatMap((c: any) => c.fotos || [])}
+                  folder="cuchillos"
+                />
+              </div>
+
               <button onClick={() => { setEditingItem({}); setEditingType('cuchillos'); }} class="px-4 py-2 bg-cognac text-cream rounded mb-4">
                 + Nuevo cuchillo
               </button>
@@ -302,6 +319,15 @@ export default function AdminPanel({ currentData }: Props) {
             />
           ) : (
             <>
+              <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Gestión de Fotos - Galería</h3>
+                <PhotoManager
+                  onFilesReady={setPhotosGaleria}
+                  existingFiles={data.galeria.map((g: any) => g.foto).filter(Boolean)}
+                  folder="galeria"
+                />
+              </div>
+
               <button onClick={() => { setEditingItem({}); setEditingType('galeria'); }} class="px-4 py-2 bg-cognac text-cream rounded mb-4">
                 + Nuevo item
               </button>
@@ -348,6 +374,15 @@ export default function AdminPanel({ currentData }: Props) {
             />
           ) : (
             <>
+              <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Gestión de Fotos - Taller</h3>
+                <PhotoManager
+                  onFilesReady={setPhotosTaller}
+                  existingFiles={data.taller.filter((t: any) => t.tipo === 'foto').map((t: any) => t.archivo).filter(Boolean)}
+                  folder="taller"
+                />
+              </div>
+
               <button onClick={() => { setEditingItem({}); setEditingType('taller'); }} class="px-4 py-2 bg-cognac text-cream rounded mb-4">
                 + Nuevo item
               </button>
