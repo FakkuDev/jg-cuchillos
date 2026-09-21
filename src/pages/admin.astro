@@ -1,76 +1,117 @@
 ---
-import { getCuchillos, getGaleria, getTaller, getMateriales } from '../lib/data';
+import {
+    getCuchillos,
+    getGaleria,
+    getTaller,
+    getMateriales,
+} from "../lib/data";
+import AdminApp from "../components/admin/AdminApp.tsx";
 
 const currentData = {
-  cuchillos: getCuchillos(),
-  galeria: getGaleria(),
-  taller: getTaller(),
-  materiales: getMateriales(),
+    cuchillos: getCuchillos(),
+    galeria: getGaleria(),
+    taller: getTaller(),
+    materiales: getMateriales(),
 };
 ---
 
 <!doctype html>
 <html lang="es-AR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex,nofollow" />
-    <title>Admin | JG Cuchillos</title>
-    <style>
-      body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-      .container { max-width: 1200px; margin: 0 auto; }
-      h1 { font-size: 24px; margin-bottom: 20px; }
-      .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
-      .tab { padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 14px; }
-      .tab.active { border-bottom: 2px solid #8B4513; margin-bottom: -2px; font-weight: bold; }
-      .panel { display: none; }
-      .panel.active { display: block; }
-      .login-form { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-      .login-form input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
-      .login-form button { width: 100%; padding: 12px; background: #8B4513; color: white; border: none; border-radius: 4px; cursor: pointer; }
-      .config-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-      .config-form input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-    </style>
-  </head>
-  <body>
-    <div id="admin-root"></div>
-
-    <script>
-      import AdminPanel from '../components/admin/AdminPanel.tsx';
-
-      const root = document.getElementById('admin-root');
-
-      const token = sessionStorage.getItem('github_token') || localStorage.getItem('github_token_remember');
-
-      if (!token) {
-        root.innerHTML = `
-          <div class="login-form">
-            <h1>🔐 Acceso Admin</h1>
-            <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Ingresá tu token de GitHub (fine-grained, permiso Contents: read/write)</p>
-            <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
-            <label style="font-size: 12px; display: flex; align-items: center; gap: 5px;">
-              <input type="checkbox" id="remember-token" /> Recordar en este dispositivo
-            </label>
-            <button id="login-btn">Ingresar</button>
-          </div>
-        `;
-
-        document.getElementById('login-btn')?.addEventListener('click', () => {
-          const tokenVal = (document.getElementById('token-input') as HTMLInputElement).value.trim();
-          const remember = (document.getElementById('remember-token') as HTMLInputElement).checked;
-
-          if (tokenVal) {
-            sessionStorage.setItem('github_token', tokenVal);
-            if (remember) localStorage.setItem('github_token_remember', tokenVal);
-            window.location.reload();
-          }
-        });
-      } else {
-        // Render Preact component
-        import('preact').then(({ render }) => {
-          render(<AdminPanel currentData={${JSON.stringify(currentData)}} />, root);
-        });
-      }
-    </script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex,nofollow" />
+        <title>Admin | JG Cuchillos</title>
+        <style is:inline>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                background: #f5f5f5;
+                margin: 0;
+                padding: 20px;
+                color: #333;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            .tabs {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #ddd;
+            }
+            .tab {
+                padding: 10px 20px;
+                cursor: pointer;
+                border: none;
+                background: none;
+                font-size: 14px;
+                color: #666;
+            }
+            .tab.active {
+                border-bottom: 2px solid #8b4513;
+                margin-bottom: -2px;
+                font-weight: bold;
+                color: #8b4513;
+            }
+            .panel {
+                display: none;
+            }
+            .panel.active {
+                display: block;
+            }
+            .login-form {
+                max-width: 400px;
+                margin: 100px auto;
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .login-form input {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            .login-form button {
+                width: 100%;
+                padding: 12px;
+                background: #8b4513;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .login-form button:hover {
+                background: #6d360f;
+            }
+            .config-form {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .config-form input {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #eee;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- client:only="preact" le dice a Astro que esto solo se ejecuta en el navegador -->
+        <AdminApp client:only="preact" initialData={currentData} />
+    </body>
 </html>
