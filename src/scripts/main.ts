@@ -4,14 +4,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Filtros mobile
     const toggleFiltersBtn = document.getElementById('toggle-filters');
     const filterPanel = document.getElementById('filter-panel');
-    toggleFiltersBtn?.addEventListener('click', () => filterPanel?.classList.toggle('hidden'));
+
+    if (toggleFiltersBtn && filterPanel) {
+        toggleFiltersBtn.addEventListener('click', () => {
+            filterPanel.classList.toggle('hidden');
+        });
+    }
 
     // 2. Limpiar filtros
-    document.getElementById('clear-filters')?.addEventListener('click', () => {
-        document.querySelectorAll('.filter-input').forEach((input: any) => input.checked = false);
-        window.history.pushState({}, '', '/');
-        window.location.reload();
-    });
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-input').forEach((input: any) => input.checked = false);
+            window.history.pushState({}, '', '/');
+            window.location.reload();
+        });
+    }
 
     // 3. Lightbox Galería
     const lightbox = document.getElementById('gallery-lightbox');
@@ -42,8 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lightbox?.classList.add('hidden');
         document.body.style.overflow = '';
     };
+
     closeGallery?.addEventListener('click', closeLightbox);
-    lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    lightbox?.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
 
     // 4. Formulario Contacto
     const btnWa = document.getElementById('btn-wa');
@@ -69,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { name, email, phone, msg } = getFormData();
         const subject = encodeURIComponent(`Contacto desde la web - ${name}`);
         const body = encodeURIComponent(`Nombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\n\nMensaje:\n${msg}`);
-        window.location.href = `mailto:{EMAIL_NEGOCIO}?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
     });
 
     // 5. Fachada de videos de YouTube
