@@ -35,7 +35,7 @@ export default function PreviewChanges({ changes, files, photos, token, owner, r
 
       const allFiles = [
         ...files.map(f => ({ path: f.path, content: typeof f.content === 'string' ? f.content : '' })),
-        ...photos.map(p => ({ path: `src/assets/cuchillos/${p.name}`, content: p.blob })),
+        ...photos.map(p => ({ path: `public/cuchillos/${p.name}`, content: p.blob })),
       ];
 
       const result = await client.commitFiles(allFiles, 'Update from admin panel');
