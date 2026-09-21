@@ -1,818 +1,465 @@
 ---
+import { getCuchillos } from "../lib/data";
 import Layout from "../components/Layout.astro";
-import { siteConfig } from "../config/site";
-import {
-    getCuchillos,
-    getGaleria,
-    getTaller,
-    getMateriales,
-} from "../lib/data";
-import { resolveImage } from "../lib/imageHelper";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import KnifeCard from "../components/KnifeCard.astro";
+import { siteConfig } from "../config/site";
 
-const cuchillos = getCuchillos();
-const galeria = getGaleria();
-const taller = getTaller();
-const materiales = getMateriales();
-
-const materialesAgrupados = materiales.reduce(
-    (acc, mat) => {
-        if (!acc[mat.categoria]) acc[mat.categoria] = [];
-        acc[mat.categoria].push(mat);
-        return acc;
-    },
-    {} as Record<string, typeof materiales>,
-);
-
-const getUniqueValues = (key: string) => {
-    const values = new Map<string, number>();
-    cuchillos.forEach((c) => {
-        const val =
-            (c as any)[key]?.toString().toLowerCase() || "sin especificar";
-        values.set(val, (values.get(val) || 0) + 1);
-    });
-    return Array.from(values.entries()).sort((a, b) => b[1] - a[1]);
-};
-
-const aceros = getUniqueValues("acero");
-const cabos = getUniqueValues("cabo");
-const terminaciones = getUniqueValues("terminacion");
-const estados = getUniqueValues("estado");
-
-const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Store",
-    name: siteConfig.name,
-    description: siteConfig.rubro,
-    url: siteConfig.url,
-    telephone: `+${siteConfig.whatsapp}`,
-    address: {
-        "@type": "PostalAddress",
-        streetAddress: "Av. Mitre 1010",
-        addressLocality: "Junín",
-        addressRegion: "Mendoza",
-        postalCode: "5573",
-        addressCountry: "AR",
-    },
-    openingHoursSpecification: [
-        {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            opens: "08:00",
-            closes: "20:00",
-        },
-        {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: "Saturday",
-            opens: "08:00",
-            closes: "14:00",
-        },
-    ],
-    sameAs: [siteConfig.instagram, siteConfig.facebook],
-};
+const cuchillos = getCuchillos().filter((c) => c.activo !== false);
 ---
 
-<Layout
-    title="Inicio"
-    description={`${siteConfig.name}. ${siteConfig.gancho} Cuchillería artesanal en Junín, Mendoza. Stock y por encargo.`}
-    {jsonLd}
->
-    <!-- HERO -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <h1 class="text-4xl md:text-5xl font-serif mb-4 text-charcoal">
-            {siteConfig.gancho}
-        </h1>
-        <p class="text-lg text-charcoal/80 mb-8 max-w-2xl mx-auto">
-            Cuchillería artesanal en Junín, Mendoza. Trabajamos en stock y por
-            encargo.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#productos" class="btn-primary">
-                Ver cuchillos
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cream/20">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </span>
-            </a>
-            <a
-                href={`https://wa.me/${siteConfig.whatsapp}?text=Hola,%20quiero%20cotizar%20un%20cuchillo.`}
-                target="_blank"
-                rel="noopener"
-                class="btn-secondary"
-            >
-                Cotizar por WhatsApp
-            </a>
-        </div>
-    </section>
+<Layout title="Inicio" description={siteConfig.gancho}>
+    <Header />
 
-    <!-- PRODUCTOS -->
-    <section
-        id="productos"
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <div class="flex flex-col md:flex-row gap-8">
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="flex items-center justify-between md:hidden mb-4">
-                    <h2 class="font-serif text-xl">Filtros</h2>
+    <main class="fade-in">
+        <!-- Hero -->
+        <section id="inicio" class="py-12 sm:py-20 bg-cream">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-charcoal mb-4 sm:mb-6 uppercase tracking-wide">
+                    {siteConfig.name}
+                </h1>
+                <p class="text-lg sm:text-xl text-charcoal/80 mb-8 sm:mb-12 italic">
+                    {siteConfig.gancho}
+                </p>
+                <a
+                    href="#productos"
+                    class="inline-block bg-cognac text-cream px-8 py-3 rounded font-medium hover:bg-opacity-90 transition-all duration-300 hover:shadow-lg"
+                >
+                    Ver catálogo
+                </a>
+            </div>
+        </section>
+
+        <!-- Productos -->
+        <section id="productos" class="py-12 sm:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Catálogo
+                </h2>
+
+                <!-- Filtros Mobile Toggle -->
+                <div class="md:hidden mb-4 flex justify-between items-center">
+                    <span class="text-charcoal font-medium">Filtros</span>
                     <button
                         id="toggle-filters"
-                        class="text-sm text-cognac font-medium"
+                        class="text-cognac font-medium text-sm"
                     >
                         Mostrar/Ocultar
                     </button>
                 </div>
 
+                <!-- Panel de Filtros -->
                 <div
                     id="filter-panel"
-                    class="hidden md:block space-y-6 bg-cream p-4 rounded-lg border border-charcoal/10"
+                    class="hidden md:block bg-cream rounded-lg p-4 sm:p-6 mb-8"
                 >
-                    <div>
-                        <h3 class="font-medium text-sm uppercase tracking-wider text-charcoal/60 mb-2">
-                            Estado
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-charcoal">
+                            Filtros
                         </h3>
-                        <div class="space-y-1">
-                            {estados.map(([val, count]) => (
-                                <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-cognac transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
-                                        data-type="estado"
-                                        value={val}
-                                    />
-                                    <span class="capitalize">{val}</span>
-                                    <span class="text-charcoal/40 text-xs">
-                                        ({count})
-                                    </span>
-                                </label>
-                            ))}
+                        <button
+                            id="clear-filters"
+                            class="text-xs sm:text-sm text-cognac hover:underline"
+                        >
+                            Limpiar filtros
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
+                                    data-filter="estado"
+                                    data-value="En stock"
+                                />
+                                <span class="text-sm text-charcoal">
+                                    En stock
+                                </span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
+                                    data-filter="estado"
+                                    data-value="Por encargo"
+                                />
+                                <span class="text-sm text-charcoal">
+                                    Por encargo
+                                </span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
+                                    data-filter="destacado"
+                                    data-value="true"
+                                />
+                                <span class="text-sm text-charcoal">
+                                    Destacados
+                                </span>
+                            </label>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="font-medium text-sm uppercase tracking-wider text-charcoal/60 mb-2">
-                            Acero
-                        </h3>
-                        <div class="space-y-1 max-h-40 overflow-y-auto">
-                            {aceros.map(([val, count]) => (
-                                <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-cognac transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
-                                        data-type="acero"
-                                        value={val}
-                                    />
-                                    <span class="capitalize">{val}</span>
-                                    <span class="text-charcoal/40 text-xs">
-                                        ({count})
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-medium text-sm uppercase tracking-wider text-charcoal/60 mb-2">
-                            Cabo
-                        </h3>
-                        <div class="space-y-1 max-h-40 overflow-y-auto">
-                            {cabos.map(([val, count]) => (
-                                <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-cognac transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
-                                        data-type="cabo"
-                                        value={val}
-                                    />
-                                    <span class="capitalize">{val}</span>
-                                    <span class="text-charcoal/40 text-xs">
-                                        ({count})
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-medium text-sm uppercase tracking-wider text-charcoal/60 mb-2">
-                            Terminación
-                        </h3>
-                        <div class="space-y-1 max-h-40 overflow-y-auto">
-                            {terminaciones.map(([val, count]) => (
-                                <label class="flex items-center gap-2 text-sm cursor-pointer hover:text-cognac transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        class="filter-input rounded border-charcoal/30 text-cognac focus:ring-cognac"
-                                        data-type="terminacion"
-                                        value={val}
-                                    />
-                                    <span class="capitalize">{val}</span>
-                                    <span class="text-charcoal/40 text-xs">
-                                        ({count})
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <button
-                        id="clear-filters"
-                        class="w-full text-xs text-cognac underline hover:text-charcoal transition-colors"
-                    >
-                        Limpiar filtros
-                    </button>
                 </div>
-            </aside>
 
-            <div class="flex-1">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Grid de cuchillos -->
+                <div
+                    id="knife-grid"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                >
                     {cuchillos.map((c) => (
                         <KnifeCard cuchillo={c} />
                     ))}
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- GALERÍA -->
-    <section
-        id="galeria"
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <h2 class="text-3xl font-serif mb-2 text-center">
-            Trabajos realizados
-        </h2>
-        <p class="text-center text-charcoal/60 text-sm mb-8">
-            (No están a la venta, se pueden hacer por encargo)
-        </p>
+        <!-- Galería -->
+        <section id="galeria" class="py-12 sm:py-16 bg-cream">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Trabajos realizados
+                </h2>
+                <div
+                    id="gallery-grid"
+                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+                ></div>
+            </div>
+        </section>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {galeria.map((item) => (
-                <button
-                    class="gallery-trigger relative aspect-square group overflow-hidden rounded-lg bg-cream"
-                    data-name={item.nombre}
-                    data-desc={item.descripcion || ""}
-                >
-                    <img
-                        src={resolveImage("galeria", item.foto)}
-                        alt={item.nombre}
-                        width="400"
-                        height="400"
-                        loading="lazy"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div class="absolute inset-0 bg-black/50 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span class="text-cream font-medium text-sm text-left">
-                            {item.nombre}
-                        </span>
-                    </div>
-                </button>
-            ))}
-        </div>
-    </section>
-
-    <!-- INFORMACIÓN ÚTIL -->
-    <section
-        id="info"
-        class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <h2 class="text-3xl font-serif mb-8 text-center">Información útil</h2>
-        <div class="space-y-4">
-            <details class="bg-cream p-5 rounded-lg border border-charcoal/10 group">
-                <summary class="font-serif text-xl cursor-pointer list-none flex justify-between items-center">
-                    Cuidados y mantenimiento
-                    <span class="text-cognac transition-transform group-open:rotate-180">
-                        ▼
-                    </span>
-                </summary>
-                <div class="mt-4 text-charcoal/80 space-y-3 text-sm leading-relaxed">
-                    <p>
-                        <strong>Limpieza y secado:</strong> Lavalos y secalos
-                        apenas termines de usarlos. El agua y la humedad son los
-                        principales enemigos del acero al carbono. Secalos bien
-                        con un paño.
-                    </p>
-                    <p>
-                        <strong>Aceite:</strong> Antes de guardarlos por un
-                        tiempo, pasales una capa fina de aceite mineral, de
-                        camelia o de cocina. Esto crea una barrera contra la
-                        oxidación.
-                    </p>
-                    <p>
-                        <strong>Guardado:</strong> Guárdalos en un lugar seco.
-                        Si tienen vaina de cuero, asegurate de que tanto el
-                        cuchillo como la vaina estén perfectamente secos antes
-                        de enfundarlos.
-                    </p>
-                    <p>
-                        <strong>Vaina de cuero:</strong> El cuero necesita
-                        hidratación. Cada tanto, aplicale una capa de grasa de
-                        caballo, neatsfoot oil o crema para cuero para que no se
-                        reseque ni se agriete.
-                    </p>
-                </div>
-            </details>
-
-            <details class="bg-cream p-5 rounded-lg border border-charcoal/10 group">
-                <summary class="font-serif text-xl cursor-pointer list-none flex justify-between items-center">
-                    Tipos de afilado
-                    <span class="text-cognac transition-transform group-open:rotate-180">
-                        ▼
-                    </span>
-                </summary>
-                <div class="mt-4 text-charcoal/80 space-y-3 text-sm leading-relaxed">
-                    <p>
-                        <strong>Filo plano (V):</strong> El más común. Versátil
-                        y fácil de mantener. Se afila manteniendo un ángulo
-                        constante (generalmente entre 15° y 20°) sobre la
-                        piedra.
-                    </p>
-                    <p>
-                        <strong>Scandi:</strong> Típico de cuchillos de monte y
-                        bushcraft. Tiene un bisel ancho y robusto, muy
-                        resistente para trabajar madera. Se afila apoyando todo
-                        el bisel plano sobre la piedra.
-                    </p>
-                    <p>
-                        <strong>Convexo:</strong> El filo se curva hacia afuera.
-                        Es extremadamente duradero y resistente a astillados,
-                        ideal para hachas y cuchillos de trabajo pesado. Se
-                        afila con piedras flexibles o cuero con pasta.
-                    </p>
-                    <p>
-                        <strong>Cómo afilar:</strong> Usá piedras de agua o de
-                        diamante. Empezá con un grano medio (400-1000) para
-                        reparar el filo y terminá con uno fino (3000-8000) para
-                        pulirlo. Mantener el ángulo original es la clave.
-                    </p>
-                </div>
-            </details>
-
-            <details class="bg-cream p-5 rounded-lg border border-charcoal/10 group">
-                <summary class="font-serif text-xl cursor-pointer list-none flex justify-between items-center">
-                    Seguridad y uso
-                    <span class="text-cognac transition-transform group-open:rotate-180">
-                        ▼
-                    </span>
-                </summary>
-                <div class="mt-4 text-charcoal/80 space-y-3 text-sm leading-relaxed">
-                    <p>
-                        Un cuchillo bien afilado es más seguro que uno
-                        desafilado, porque requiere menos fuerza y controlás
-                        mejor el corte.
-                    </p>
-                    <p>
-                        Cortá siempre alejando el filo de tu cuerpo y de tus
-                        manos. Usá una superficie estable.
-                    </p>
-                    <p>
-                        No los uses como palanca o destornillador; el acero de
-                        los cuchillos es duro pero frágil a la torsión y puede
-                        quebrarse.
-                    </p>
-                    <p>
-                        Mantenelos fuera del alcance de los niños. Usá fundas o
-                        bloques magnéticos para guardarlos.
-                    </p>
-                </div>
-            </details>
-        </div>
-    </section>
-
-    <!-- CÓMO COMPRAR -->
-    <section
-        id="comprar"
-        class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <h2 class="text-3xl font-serif mb-8 text-center">Cómo comprar</h2>
-        <div class="grid md:grid-cols-2 gap-8 mb-12">
-            <div class="space-y-6">
-                <div class="flex gap-4">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cognac text-cream flex items-center justify-center font-bold">
-                        1
-                    </span>
-                    <div>
-                        <h3 class="font-serif text-lg mb-1">
-                            Elegí o contanos tu idea
+        <!-- Información útil -->
+        <section id="info" class="py-12 sm:py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Información útil
+                </h2>
+                <div class="prose prose-charcoal max-w-none">
+                    <div class="bg-cream rounded-lg p-6 sm:p-8 mb-6">
+                        <h3 class="font-serif text-xl sm:text-2xl mb-4">
+                            Materiales que utilizamos
                         </h3>
-                        <p class="text-sm text-charcoal/70">
-                            Revisá el catálogo o describinos el cuchillo que
-                            tenés en mente (uso, tamaño, materiales preferidos).
+                        <p class="text-charcoal/80 mb-4">
+                            Trabajamos con los mejores aceros del mercado: N690,
+                            80CRV2, 5160, 440C, 14C28N, Damasco, entre otros.
+                            Cada uno seleccionado según el uso específico del
+                            cuchillo.
+                        </p>
+                        <p class="text-charcoal/80">
+                            Para los cabos utilizamos maderas nobles como
+                            Guayubira, Palo Santo, Nogal, y materiales
+                            sintéticos de alta resistencia.
                         </p>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cognac text-cream flex items-center justify-center font-bold">
-                        2
-                    </span>
-                    <div>
-                        <h3 class="font-serif text-lg mb-1">
-                            Coordinamos por WhatsApp
+            </div>
+        </section>
+
+        <!-- Cómo comprar -->
+        <section id="comprar" class="py-12 sm:py-16 bg-cream">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Cómo comprar
+                </h2>
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg p-6">
+                        <h3 class="font-serif text-xl mb-3">
+                            1. Elegí tu cuchillo
                         </h3>
-                        <p class="text-sm text-charcoal/70">
-                            Definimos juntos los detalles, el precio final y los
-                            tiempos estimados de trabajo.
+                        <p class="text-charcoal/80">
+                            Recorré nuestro catálogo y seleccioná el modelo que
+                            más te guste.
+                        </p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6">
+                        <h3 class="font-serif text-xl mb-3">2. Consultanos</h3>
+                        <p class="text-charcoal/80">
+                            Escribinos por WhatsApp o email para confirmar
+                            stock, precio y detalles.
+                        </p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6">
+                        <h3 class="font-serif text-xl mb-3">
+                            3. Coordinamos el envío
+                        </h3>
+                        <p class="text-charcoal/80">
+                            Enviamos a todo el país por correo o retiro en el
+                            taller con cita previa.
                         </p>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cognac text-cream flex items-center justify-center font-bold">
-                        3
-                    </span>
-                    <div>
-                        <h3 class="font-serif text-lg mb-1">Pago y entrega</h3>
-                        <p class="text-sm text-charcoal/70">
-                            Acordamos la forma de pago. Te avisamos cuando está
-                            listo para coordinar el envío a todo el país o el
-                            retiro en el taller.
-                        </p>
-                    </div>
-                </div>
             </div>
+        </section>
 
-            <div class="bg-cream p-6 rounded-lg border border-charcoal/10">
-                <h3 class="font-serif text-xl mb-4">Materiales disponibles</h3>
-                <div class="space-y-3">
-                    {Object.entries(materialesAgrupados).map(([cat, mats]) => (
-                        <details class="border-b border-charcoal/10 pb-2">
-                            <summary class="font-medium text-sm cursor-pointer py-2 flex justify-between items-center">
-                                {cat}
-                                <span class="text-cognac text-xs">▼</span>
-                            </summary>
-                            <ul class="pl-4 pb-2 space-y-1">
-                                {mats
-                                    .filter((m) => m.disponible)
-                                    .map((m) => (
-                                        <li class="text-sm text-charcoal/80">
-                                            <strong>{m.nombre}:</strong>{" "}
-                                            {m.nota}
-                                        </li>
-                                    ))}
-                            </ul>
-                        </details>
-                    ))}
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CONTACTO -->
-    <section
-        id="contacto"
-        class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <h2 class="text-3xl font-serif mb-8 text-center">Contacto</h2>
-        <div class="grid md:grid-cols-2 gap-12">
-            <div class="space-y-6">
-                <div>
-                    <h3 class="font-serif text-lg mb-2">Dónde estamos</h3>
-                    <p class="text-sm text-charcoal/80">
-                        {siteConfig.direccion}
-                    </p>
-                    <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.direccion)}`}
-                        target="_blank"
-                        rel="noopener"
-                        class="text-cognac text-sm underline mt-1 inline-block"
-                    >
-                        Cómo llegar en Google Maps
-                    </a>
-                    <p class="text-xs text-charcoal/50 mt-2 italic">
-                        Coordiná tu visita por WhatsApp antes de pasar.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="font-serif text-lg mb-2">Horarios</h3>
-                    <p class="text-sm text-charcoal/80">
-                        {siteConfig.horarios}
-                    </p>
-                </div>
-                <div>
-                    <h3 class="font-serif text-lg mb-2">Escribinos</h3>
-                    <ul class="text-sm space-y-2">
-                        <li>
-                            WhatsApp:{" "}
-                            <a
-                                href={`https://wa.me/${siteConfig.whatsapp}`}
-                                class="text-cognac hover:underline"
-                            >
-                                +{siteConfig.whatsapp}
-                            </a>
-                        </li>
-                        <li>
-                            Email:{" "}
-                            <a
-                                href={`mailto:${siteConfig.email}`}
-                                class="text-cognac hover:underline"
-                            >
-                                {siteConfig.email}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-serif text-lg mb-2">Seguinos</h3>
-                    <div class="flex gap-4">
-                        <a
-                            href={siteConfig.instagram}
-                            target="_blank"
-                            rel="noopener"
-                            class="text-charcoal hover:text-cognac transition-colors"
-                            aria-label="Instagram"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <rect
-                                    x="2"
-                                    y="2"
-                                    width="20"
-                                    height="20"
-                                    rx="5"
-                                    ry="5"
-                                ></rect>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                <line
-                                    x1="17.5"
-                                    y1="6.5"
-                                    x2="17.51"
-                                    y2="6.5"
-                                ></line>
-                            </svg>
-                        </a>
-                        <a
-                            href={siteConfig.facebook}
-                            target="_blank"
-                            rel="noopener"
-                            class="text-charcoal hover:text-cognac transition-colors"
-                            aria-label="Facebook"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-cream p-6 rounded-lg border border-charcoal/10">
-                <h3 class="font-serif text-xl mb-4">Envianos un mensaje</h3>
-                <form id="contact-form" class="space-y-4">
-                    <div>
-                        <label
-                            for="c-name"
-                            class="block text-xs font-medium text-charcoal/60 mb-1"
-                        >
-                            Nombre *
-                        </label>
-                        <input
-                            type="text"
-                            id="c-name"
-                            required
-                            class="w-full px-3 py-2 rounded border border-charcoal/20 bg-white focus:outline-none focus:border-cognac text-sm"
-                        />
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+        <!-- Contacto -->
+        <section id="contacto" class="py-12 sm:py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Contacto
+                </h2>
+                <div class="bg-cream rounded-lg p-6 sm:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label
-                                for="c-email"
-                                class="block text-xs font-medium text-charcoal/60 mb-1"
-                            >
-                                Email *
-                            </label>
-                            <input
-                                type="email"
-                                id="c-email"
-                                required
-                                class="w-full px-3 py-2 rounded border border-charcoal/20 bg-white focus:outline-none focus:border-cognac text-sm"
-                            />
+                            <h3 class="font-serif text-xl mb-4">Información</h3>
+                            <p class="text-charcoal/80 mb-2">
+                                <strong>Dirección:</strong>{" "}
+                                {siteConfig.direccion}
+                            </p>
+                            <p class="text-charcoal/80 mb-2">
+                                <strong>Horarios:</strong> {siteConfig.horarios}
+                            </p>
+                            <p class="text-charcoal/80 mb-2">
+                                <strong>WhatsApp:</strong> {siteConfig.whatsapp}
+                            </p>
+                            <p class="text-charcoal/80">
+                                <strong>Email:</strong> {siteConfig.email}
+                            </p>
                         </div>
                         <div>
-                            <label
-                                for="c-phone"
-                                class="block text-xs font-medium text-charcoal/60 mb-1"
-                            >
-                                Teléfono (opcional)
-                            </label>
-                            <input
-                                type="tel"
-                                id="c-phone"
-                                class="w-full px-3 py-2 rounded border border-charcoal/20 bg-white focus:outline-none focus:border-cognac text-sm"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label
-                            for="c-msg"
-                            class="block text-xs font-medium text-charcoal/60 mb-1"
-                        >
-                            Mensaje (opcional)
-                        </label>
-                        <textarea
-                            id="c-msg"
-                            rows="3"
-                            class="w-full px-3 py-2 rounded border border-charcoal/20 bg-white focus:outline-none focus:border-cognac text-sm"
-                        ></textarea>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                        <button
-                            type="button"
-                            id="btn-wa"
-                            class="btn-primary flex-1 text-sm py-2"
-                        >
-                            Enviar por WhatsApp
-                        </button>
-                        <button
-                            type="button"
-                            id="btn-email"
-                            class="btn-secondary flex-1 text-sm py-2"
-                        >
-                            Enviar por email
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- TALLER -->
-    <section
-        id="taller"
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-charcoal/10"
-    >
-        <h2 class="text-3xl font-serif mb-8 text-center">Taller</h2>
-        <div class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            {taller.map((item) => (
-                <div class="break-inside-avoid mb-4 bg-cream rounded-lg border border-charcoal/10 overflow-hidden">
-                    {item.tipo === "foto" ? (
-                        <img
-                            src={resolveImage("taller", item.archivo || "")}
-                            alt={item.alt}
-                            width="400"
-                            height="400"
-                            loading="lazy"
-                            class="w-full h-auto"
-                        />
-                    ) : (
-                        <div
-                            class="video-facade relative aspect-video bg-dark cursor-pointer group"
-                            data-url={item.url}
-                        >
-                            <img
-                                src={`https://img.youtube.com/vi/${item.url?.split("v=")[1] || item.url?.split("/").pop()}/hqdefault.jpg`}
-                                alt={item.alt}
-                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                            />
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="w-12 h-12 rounded-full bg-cognac/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="white"
-                                        stroke="white"
-                                        stroke-width="1"
+                            <h3 class="font-serif text-xl mb-4">Escribinos</h3>
+                            <div class="space-y-4">
+                                <input
+                                    type="text"
+                                    id="c-name"
+                                    placeholder="Nombre"
+                                    class="w-full px-4 py-2 rounded border border-charcoal/20 focus:outline-none focus:border-cognac"
+                                />
+                                <input
+                                    type="email"
+                                    id="c-email"
+                                    placeholder="Email"
+                                    class="w-full px-4 py-2 rounded border border-charcoal/20 focus:outline-none focus:border-cognac"
+                                />
+                                <input
+                                    type="tel"
+                                    id="c-phone"
+                                    placeholder="Teléfono"
+                                    class="w-full px-4 py-2 rounded border border-charcoal/20 focus:outline-none focus:border-cognac"
+                                />
+                                <textarea
+                                    id="c-msg"
+                                    rows={4}
+                                    placeholder="Mensaje"
+                                    class="w-full px-4 py-2 rounded border border-charcoal/20 focus:outline-none focus:border-cognac"
+                                ></textarea>
+                                <div class="flex gap-3">
+                                    <button
+                                        id="btn-wa"
+                                        class="flex-1 bg-cognac text-cream px-6 py-2 rounded font-medium hover:bg-opacity-90 transition"
                                     >
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
+                                        Enviar por WhatsApp
+                                    </button>
+                                    <button
+                                        id="btn-email"
+                                        class="flex-1 bg-charcoal text-cream px-6 py-2 rounded font-medium hover:bg-opacity-90 transition"
+                                    >
+                                        Enviar por email
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    )}
-                    <div class="p-3">
-                        <h3 class="font-serif text-sm font-semibold text-charcoal">
-                            {item.titulo}
-                        </h3>
                     </div>
                 </div>
-            ))}
-        </div>
-    </section>
+            </div>
+        </section>
 
-    <!-- MODAL CUCHILLO -->
-    <dialog
-        id="knife-modal"
-        class="w-full max-w-4xl p-0 rounded-lg shadow-2xl border-0 bg-cream backdrop:bg-black/50 open:animate-fade-in"
-    >
-        <div class="relative">
-            <button
-                id="close-modal"
-                class="absolute top-4 right-4 z-10 bg-white/80 p-2 rounded-full hover:bg-white transition-colors"
-                aria-label="Cerrar"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            <div
-                id="modal-content-inner"
-                class="max-h-[90vh] overflow-y-auto"
-            ></div>
-        </div>
-    </dialog>
+        <!-- Taller -->
+        <section id="taller" class="py-12 sm:py-16 bg-cream">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-charcoal mb-8 sm:mb-12 text-center">
+                    Taller
+                </h2>
+                <div
+                    id="taller-grid"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                ></div>
+            </div>
+        </section>
+    </main>
 
-    <!-- LIGHTBOX GALERÍA -->
-    <div
-        id="gallery-lightbox"
-        class="fixed inset-0 z-[60] bg-black/90 hidden flex items-center justify-center p-4"
-    >
-        <button
-            id="close-gallery"
-            class="absolute top-4 right-4 text-white p-2 hover:text-cognac transition-colors"
-            aria-label="Cerrar"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </button>
-        <div class="max-w-3xl w-full text-center">
-            <img
-                id="gallery-img"
-                src=""
-                alt=""
-                class="max-h-[75vh] mx-auto rounded-lg shadow-2xl"
-            />
-            <p
-                id="gallery-caption"
-                class="text-cream mt-4 text-lg font-serif"
-            ></p>
-            <a
-                id="gallery-wa"
-                href=""
-                target="_blank"
-                rel="noopener"
-                class="btn-primary mt-6 inline-block"
-            >
-                Encargar uno así
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cream/20">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </span>
-            </a>
-        </div>
-    </div>
-
-    <!-- SCRIPTS -->
-    <script src="../scripts/catalog.ts"></script>
-    <script src="../scripts/main.ts"></script>
+    <Footer />
 </Layout>
+
+<script>
+    import { getGaleria, getTaller } from "../lib/data";
+    import { resolveImage } from "../lib/imageHelper";
+    import { siteConfig } from "../config/site";
+
+    const galeria = getGaleria();
+    const taller = getTaller();
+
+    // Render galería
+    const galleryGrid = document.getElementById("gallery-grid");
+    if (galleryGrid) {
+        galeria.forEach((item) => {
+            const div = document.createElement("div");
+            div.className =
+                "aspect-square overflow-hidden rounded-lg cursor-pointer gallery-trigger";
+            div.setAttribute("data-name", item.nombre);
+            div.setAttribute("data-desc", item.descripcion || "");
+            div.innerHTML = `<img src="${resolveImage("galeria", item.foto)}" alt="${item.nombre}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" loading="lazy" />`;
+            galleryGrid.appendChild(div);
+        });
+    }
+
+    // Render taller
+    const tallerGrid = document.getElementById("taller-grid");
+    if (tallerGrid) {
+        taller.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "bg-white rounded-lg overflow-hidden";
+            if (item.tipo === "foto") {
+                div.innerHTML = `<img src="${resolveImage("taller", item.archivo)}" alt="${item.alt}" class="w-full h-64 object-cover" loading="lazy" />`;
+            } else {
+                div.innerHTML = `
+          <div class="video-facade relative bg-charcoal aspect-video cursor-pointer" data-url="${item.url}">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-16 h-16 rounded-full bg-cream/90 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </div>
+            </div>
+          </div>
+        `;
+            }
+            tallerGrid.appendChild(div);
+        });
+    }
+</script>
+
+<script>
+    // Filtros y demás funcionalidades
+    document.addEventListener("DOMContentLoaded", () => {
+        const WHATSAPP_NUMBER = "5492634212157";
+
+        // 1. Filtros mobile
+        const toggleFiltersBtn = document.getElementById("toggle-filters");
+        const filterPanel = document.getElementById("filter-panel");
+
+        if (toggleFiltersBtn && filterPanel) {
+            toggleFiltersBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                filterPanel.classList.toggle("hidden");
+            });
+        }
+
+        // 2. Limpiar filtros
+        const clearFiltersBtn = document.getElementById("clear-filters");
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener("click", () => {
+                document
+                    .querySelectorAll(".filter-input")
+                    .forEach((input: any) => (input.checked = false));
+                window.history.pushState({}, "", "/");
+                window.location.reload();
+            });
+        }
+
+        // 3. Lightbox Galería
+        const lightbox = document.getElementById("gallery-lightbox");
+        const galleryImg = document.getElementById(
+            "gallery-img",
+        ) as HTMLImageElement;
+        const galleryCaption = document.getElementById("gallery-caption");
+        const galleryWa = document.getElementById(
+            "gallery-wa",
+        ) as HTMLAnchorElement;
+        const closeGallery = document.getElementById("close-gallery");
+
+        document.querySelectorAll(".gallery-trigger").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const img = btn.querySelector("img");
+                const name = btn.getAttribute("data-name") || "";
+                const desc = btn.getAttribute("data-desc") || "";
+
+                if (galleryImg && img) galleryImg.src = img.src;
+                if (galleryCaption)
+                    galleryCaption.textContent = `${name} ${desc ? "- " + desc : ""}`;
+                if (galleryWa) {
+                    const waText = encodeURIComponent(
+                        `Hola, me interesa encargar un trabajo similar a "${name}".`,
+                    );
+                    galleryWa.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${waText}`;
+                }
+
+                lightbox?.classList.remove("hidden");
+                document.body.style.overflow = "hidden";
+            });
+        });
+
+        const closeLightbox = () => {
+            lightbox?.classList.add("hidden");
+            document.body.style.overflow = "";
+        };
+
+        closeGallery?.addEventListener("click", closeLightbox);
+        lightbox?.addEventListener("click", (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        // 4. Formulario Contacto
+        const btnWa = document.getElementById("btn-wa");
+        const btnEmail = document.getElementById("btn-email");
+
+        const getFormData = () => {
+            const name =
+                (document.getElementById("c-name") as HTMLInputElement)
+                    ?.value || "";
+            const email =
+                (document.getElementById("c-email") as HTMLInputElement)
+                    ?.value || "";
+            const phone =
+                (document.getElementById("c-phone") as HTMLInputElement)
+                    ?.value || "";
+            const msg =
+                (document.getElementById("c-msg") as HTMLTextAreaElement)
+                    ?.value || "";
+            return { name, email, phone, msg };
+        };
+
+        btnWa?.addEventListener("click", () => {
+            const { name, phone, msg } = getFormData();
+            let text = `Hola, soy ${name}.`;
+            if (phone) text += ` Mi teléfono es ${phone}.`;
+            if (msg) text += ` ${msg}`;
+            window.open(
+                `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`,
+                "_blank",
+            );
+        });
+
+        btnEmail?.addEventListener("click", () => {
+            const { name, email, phone, msg } = getFormData();
+            const subject = encodeURIComponent(
+                `Contacto desde la web - ${name}`,
+            );
+            const body = encodeURIComponent(
+                `Nombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\n\nMensaje:\n${msg}`,
+            );
+            window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
+        });
+
+        // 5. Fachada de videos de YouTube
+        document.querySelectorAll(".video-facade").forEach((facade) => {
+            facade.addEventListener("click", () => {
+                const url = facade.getAttribute("data-url") || "";
+                const videoId =
+                    url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
+                if (videoId) {
+                    const iframe = document.createElement("iframe");
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    iframe.allow =
+                        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
+                    iframe.className = "w-full h-full absolute inset-0";
+                    facade.innerHTML = "";
+                    facade.appendChild(iframe);
+                }
+            });
+        });
+    });
+</script>
