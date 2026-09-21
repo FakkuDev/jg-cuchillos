@@ -4,14 +4,16 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  integrations: [preact(), tailwind(), sitemap()],
+  integrations: [
+    preact(),
+    tailwind(),
+    sitemap({
+      // Excluimos el panel de admin del sitemap
+      filter: (page) => !page.includes('/admin/')
+    })
+  ],
   output: 'static',
-  site: 'https://URL_FINAL_DEL_SITIO',
-  vite: {
-    build: {
-      rollupOptions: {
-        external: ['exceljs']
-      }
-    }
-  }
+  // Usá la URL que te dio Cloudflare (ej: https://jg-cuchillos.pages.dev)
+  // o tu dominio propio cuando lo tengas.
+  site: 'https://jg-cuchillos.pages.dev',
 });
