@@ -1,9 +1,10 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import ExcelManager from './ExcelManager';
 import PhotoManager from './PhotoManager';
 import SingleEditor from './SingleEditor';
 import PreviewChanges from './PreviewChanges';
+import { GitHubClient } from '../../lib/admin/github';
 
 interface Props {
   currentData: {
@@ -21,29 +22,86 @@ export default function AdminPanel({ currentData }: Props) {
   const [editingType, setEditingType] = useState<any>(null);
   const [photos, setPhotos] = useState<{ name: string; blob: Blob }[]>([]);
   const [pendingChanges, setPendingChanges] = useState<any>(null);
+  const [status, setStatus] = useState('');
 
   const token = sessionStorage.getItem('github_token') || localStorage.getItem('github_token_remember') || '';
-  const owner = import.meta.env.PUBLIC_GITHUB_OWNER || 'tu-usuario';
+  const owner = import.meta.env.PUBLIC_GITHUB_OWNER || 'FakkuDev';
   const repo = import.meta.env.PUBLIC_GITHUB_REPO || 'jg-cuchillos';
   const branch = import.meta.env.PUBLIC_GITHUB_BRANCH || 'main';
 
-  const handleValidData = (newData: any) => {
+  // Calcular cambios pendientes comparando con los datos iniciales
+  useEffect(() => {
     const changes = {
-      new: newData.cuchillos.filter((c: any) => !data.cuchillos.find((dc: any) => dc.id === c.id)).length,
-      updated: newData.cuchillos.filter((c: any) => data.cuchillos.find((dc: any) => dc.id === c.id)).length,
-      hidden: newData.cuchillos.filter((c: any) => !c.activo).length,
+      new: 0,
+      updated: 0,
+      hidden: 0,
       deleted: 0,
       newPhotos: photos.length,
     };
 
-    const files = [
-      { path: 'src/data/cuchillos.json', content: JSON.stringify(newData.cuchillos, null, 2) },
-      { path: 'src/data/galeria.json', content: JSON.stringify(newData.galeria, null, 2) },
-      { path: 'src/data/taller.json', content: JSON.stringify(newData.taller, null, 2) },
-      { path: 'src/data/materiales.json', content: JSON.stringify(newData.materiales, null, 2) },
-    ];
+    const hasChanges = JSON.stringify(data) !== JSON.stringify(currentData) || photos.length > 0;
 
-    setPendingChanges({ changes, files });
+    if (hasChanges) {
+      // Cuchillos
+      data.cuchillos.forEach((c: any) => {
+        const original = currentData.cuchillos.find((dc: any) => dc.id === c.id);
+        if (!original) changes.new++;
+        else if (!c.activo && original.activo) changes.hidden++;
+        else changes.updated++;
+      });
+      currentData.cuchillos.forEach((dc: any) => {
+        if (!data.cuchillos.find((c: any) => c.id === dc.id)) changes.deleted++;
+      });
+
+      // Galería
+      data.galeria.forEach((g: any) => {
+        const original = currentData.galeria.find((dg: any) => dg.id === g.id);
+        if (!original) changes.new++;
+        else if (!g.activo && original.activo) changes.hidden++;
+        else changes.updated++;
+      });
+      currentData.galeria.forEach((dg: any) => {
+        if (!data.galeria.find((g: any) => g.id === dg.id)) changes.deleted++;
+      });
+
+      // Taller
+      data.taller.forEach((t: any) => {
+        const original = currentData.taller.find((dt: any) => dt.id === t.id);
+        if (!original) changes.new++;
+        else if (!t.activo && original.activo) changes.hidden++;
+        else changes.updated++;
+      });
+      currentData.taller.forEach((dt: any) => {
+        if (!data.taller.find((t: any) => t.id === dt.id)) changes.deleted++;
+      });
+
+      // Materiales
+      data.materiales.forEach((m: any) => {
+        const original = currentData.materiales.find((dm: any) => dm.nombre === m.nombre && dm.categoria === m.categoria);
+        if (!original) changes.new++;
+        else if (!m.disponible && original.disponible) changes.hidden++;
+        else changes.updated++;
+      });
+      currentData.materiales.forEach((dm: any) => {
+        if (!data.materiales.find((m: any) => m.nombre === dm.nombre && m.categoria === dm.categoria)) changes.deleted++;
+      });
+
+      const files = [
+        { path: 'src/data/cuchillos.json', content: JSON.stringify(data.cuchillos, null, 2) },
+        { path: 'src/data/galeria.json', content: JSON.stringify(data.galeria, null, 2) },
+        { path: 'src/data/taller.json', content: JSON.stringify(data.taller, null, 2) },
+        { path: 'src/data/materiales.json', content: JSON.stringify(data.materiales, null, 2) },
+      ];
+
+      setPendingChanges({ changes, files });
+    } else {
+      setPendingChanges(null);
+    }
+  }, [data, photos]);
+
+  const handleValidData = (newData: any) => {
+    setData(newData);
+    setStatus('Datos cargados. Revisá la vista previa y publicá.');
   };
 
   const handleSaveItem = (item: any) => {
@@ -60,22 +118,52 @@ export default function AdminPanel({ currentData }: Props) {
     setData({ ...data, [type]: updated });
     setEditingItem(null);
     setEditingType(null);
+    setStatus(`✅ ${type.slice(0, -1)} guardado. Andá a la pestaña Excel para publicar.`);
   };
 
   const handleDeleteItem = (id: string, type: string) => {
     if (!confirm('¿Eliminar este item?')) return;
     const updated = data[type].filter((i: any) => i.id !== id);
     setData({ ...data, [type]: updated });
+    setStatus(`🗑️ Item eliminado. Andá a la pestaña Excel para publicar.`);
   };
 
   const handlePhotosReady = (files: { name: string; blob: Blob }[]) => {
     setPhotos(files);
   };
 
-  const handlePublished = () => {
-    setPendingChanges(null);
-    setPhotos([]);
-    alert('✅ Publicado. El sitio se reconstruirá en Cloudflare en unos minutos.');
+  const handlePublish = async () => {
+    if (!pendingChanges) return;
+    if (!confirm('¿Publicar cambios? Esto creará un commit en GitHub.')) return;
+
+    setStatus('Publicando...');
+
+    try {
+      const client = new GitHubClient(token, owner, repo, branch);
+
+      const allFiles = [
+        ...pendingChanges.files.map((f: any) => ({
+          path: f.path,
+          content: typeof f.content === 'string' ? f.content : ''
+        })),
+        ...photos.map(p => ({
+          path: `src/assets/cuchillos/${p.name}`,
+          content: p.blob
+        })),
+      ];
+
+      const result = await client.commitFiles(allFiles, 'Update from admin panel');
+
+      if (result.success && result.commitUrl) {
+        setStatus(`✅ Publicado con éxito. Cloudflare reconstruirá el sitio en 1-2 minutos.`);
+        setPendingChanges(null);
+        setPhotos([]);
+      } else {
+        setStatus(`❌ Error: ${result.error}`);
+      }
+    } catch (error: any) {
+      setStatus(`❌ Error: ${error.message}`);
+    }
   };
 
   return (
@@ -88,6 +176,16 @@ export default function AdminPanel({ currentData }: Props) {
         <input type="text" value={branch} readOnly placeholder="Branch" />
       </div>
 
+      {status && (
+        <div class={`p-3 rounded mb-4 text-sm ${
+          status.includes('✅') ? 'bg-green-50 text-green-800 border border-green-200' :
+          status.includes('❌') ? 'bg-red-50 text-red-800 border border-red-200' :
+          'bg-blue-50 text-blue-800 border border-blue-200'
+        }`}>
+          {status}
+        </div>
+      )}
+
       <div class="tabs">
         <button class={`tab ${activeTab === 'excel' ? 'active' : ''}`} onClick={() => setActiveTab('excel')}>Excel</button>
         <button class={`tab ${activeTab === 'cuchillos' ? 'active' : ''}`} onClick={() => setActiveTab('cuchillos')}>Cuchillos ({data.cuchillos.length})</button>
@@ -99,22 +197,47 @@ export default function AdminPanel({ currentData }: Props) {
       {activeTab === 'excel' && (
         <div class="panel active">
           <ExcelManager currentData={data} onValidData={handleValidData} />
+
           <div style="margin-top: 30px;">
             <h3 style="font-size: 18px; margin-bottom: 15px;">Gestión de Fotos</h3>
             <PhotoManager onFilesReady={handlePhotosReady} existingFiles={[]} />
           </div>
+
           {pendingChanges && (
             <div style="margin-top: 30px;">
-              <PreviewChanges
-                changes={pendingChanges.changes}
-                files={pendingChanges.files}
-                photos={photos}
-                token={token}
-                owner={owner}
-                repo={repo}
-                branch={branch}
-                onPublished={handlePublished}
-              />
+              <div class="bg-white p-6 rounded-lg border border-green-200 space-y-4">
+                <h3 class="font-serif text-xl font-semibold text-charcoal">Vista previa de cambios</h3>
+
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div class="bg-blue-50 p-3 rounded">
+                    <span class="block text-xs text-blue-600">Nuevos</span>
+                    <span class="font-bold text-lg text-blue-900">{pendingChanges.changes.new}</span>
+                  </div>
+                  <div class="bg-yellow-50 p-3 rounded">
+                    <span class="block text-xs text-yellow-600">Actualizados</span>
+                    <span class="font-bold text-lg text-yellow-900">{pendingChanges.changes.updated}</span>
+                  </div>
+                  <div class="bg-gray-50 p-3 rounded">
+                    <span class="block text-xs text-gray-600">Ocultos</span>
+                    <span class="font-bold text-lg text-gray-900">{pendingChanges.changes.hidden}</span>
+                  </div>
+                  <div class="bg-red-50 p-3 rounded">
+                    <span class="block text-xs text-red-600">Eliminados</span>
+                    <span class="font-bold text-lg text-red-900">{pendingChanges.changes.deleted}</span>
+                  </div>
+                  <div class="bg-green-50 p-3 rounded">
+                    <span class="block text-xs text-green-600">Fotos nuevas</span>
+                    <span class="font-bold text-lg text-green-900">{pendingChanges.changes.newPhotos}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handlePublish}
+                  class="w-full py-3 bg-green-600 text-white rounded font-medium hover:bg-green-700 transition"
+                >
+                  Publicar cambios
+                </button>
+              </div>
             </div>
           )}
         </div>

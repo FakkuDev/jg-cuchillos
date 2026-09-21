@@ -3,8 +3,6 @@ import { getCuchillos } from "../../lib/data";
 import { resolveImage } from "../../lib/imageHelper";
 import { siteConfig } from "../../config/site";
 import Layout from "../../components/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
     const cuchillos = getCuchillos();
@@ -65,133 +63,136 @@ const fotos =
     description={`${cuchillo.nombre}. ${cuchillo.descripcion} ${cuchillo.acero}, cabo de ${cuchillo.cabo}.`}
     {jsonLd}
 >
-    <Header />
+    <main id="modal-content" class="py-6 sm:py-12 fade-in visible">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <a
+                href="/"
+                class="inline-flex items-center text-xs sm:text-sm text-charcoal/60 hover:text-cognac mb-4 sm:mb-6 transition-colors"
+            >
+                ← Volver al catálogo
+            </a>
+        </div>
 
-    <main
-        id="modal-content"
-        class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 fade-in visible"
-    >
-        <a
-            href="/"
-            class="inline-flex items-center text-sm text-charcoal/60 hover:text-cognac mb-6 transition-colors"
-        >
-            ← Volver al catálogo
-        </a>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            <div class="space-y-4">
-                {fotos.map((foto, i) => (
-                    <img
-                        src={foto}
-                        alt={`${cuchillo.nombre} - Vista ${i + 1}`}
-                        width="600"
-                        height="600"
-                        class="w-full rounded-lg border border-charcoal/10 shadow-sm"
-                    />
-                ))}
-            </div>
-
-            <div class="flex flex-col">
-                <h1 class="text-3xl md:text-4xl font-serif font-semibold text-charcoal uppercase tracking-wide mb-2">
-                    {cuchillo.nombre}
-                </h1>
-                <p class="text-2xl text-cognac font-medium mb-6">
-                    {precioFormateado}
-                </p>
-
-                <p class="text-charcoal/80 mb-8 leading-relaxed">
-                    {cuchillo.descripcion}
-                </p>
-
-                <div class="bg-cream rounded-lg p-6 border border-charcoal/10 mb-8">
-                    <h2 class="font-serif text-xl mb-4">Características</h2>
-                    <dl class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
-                        <dt class="text-charcoal/60">Acero:</dt>
-                        <dd class="font-medium text-charcoal">
-                            {cuchillo.acero}
-                        </dd>
-                        <dt class="text-charcoal/60">Cabo:</dt>
-                        <dd class="font-medium text-charcoal">
-                            {cuchillo.cabo}
-                        </dd>
-                        <dt class="text-charcoal/60">Terminación:</dt>
-                        <dd class="font-medium text-charcoal">
-                            {cuchillo.terminacion}
-                        </dd>
-                        {cuchillo.largo_total_cm && (
-                            <>
-                                <dt class="text-charcoal/60">Largo total:</dt>
-                                <dd class="font-medium text-charcoal">
-                                    {cuchillo.largo_total_cm} cm
-                                </dd>
-                            </>
-                        )}
-                        {cuchillo.largo_hoja_cm && (
-                            <>
-                                <dt class="text-charcoal/60">Largo hoja:</dt>
-                                <dd class="font-medium text-charcoal">
-                                    {cuchillo.largo_hoja_cm} cm
-                                </dd>
-                            </>
-                        )}
-                        {cuchillo.espesor_mm && (
-                            <>
-                                <dt class="text-charcoal/60">Espesor:</dt>
-                                <dd class="font-medium text-charcoal">
-                                    {cuchillo.espesor_mm} mm
-                                </dd>
-                            </>
-                        )}
-                        {cuchillo.peso_g && (
-                            <>
-                                <dt class="text-charcoal/60">Peso:</dt>
-                                <dd class="font-medium text-charcoal">
-                                    {cuchillo.peso_g} g
-                                </dd>
-                            </>
-                        )}
-                        {cuchillo.vaina && (
-                            <>
-                                <dt class="text-charcoal/60">Vaina:</dt>
-                                <dd class="font-medium text-charcoal">
-                                    {cuchillo.vaina}
-                                </dd>
-                            </>
-                        )}
-                        <dt class="text-charcoal/60">Estado:</dt>
-                        <dd class="font-medium text-charcoal">
-                            {cuchillo.estado}
-                        </dd>
-                    </dl>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+                <div class="space-y-3">
+                    {fotos.map((foto, i) => (
+                        <img
+                            src={foto}
+                            alt={`${cuchillo.nombre} - Vista ${i + 1}`}
+                            width="600"
+                            height="600"
+                            class="w-full rounded-lg border border-charcoal/10 shadow-sm"
+                        />
+                    ))}
                 </div>
 
-                <a
-                    href={waLink}
-                    target="_blank"
-                    rel="noopener"
-                    class="btn-primary w-full md:w-auto text-center"
-                >
-                    Cotizar por WhatsApp
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cream/20">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </span>
-                </a>
+                <div class="flex flex-col items-center text-center">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold text-charcoal uppercase tracking-wide mb-1 sm:mb-2">
+                        {cuchillo.nombre}
+                    </h1>
+                    <p class="text-xl sm:text-2xl text-cognac font-medium mb-4 sm:mb-6">
+                        {precioFormateado}
+                    </p>
+
+                    <p class="text-sm sm:text-base text-charcoal/80 mb-6 sm:mb-8 leading-relaxed">
+                        {cuchillo.descripcion}
+                    </p>
+
+                    <div class="bg-cream rounded-lg p-4 sm:p-6 border border-charcoal/10 mb-6 sm:mb-8 w-full">
+                        <h2 class="font-serif text-lg sm:text-xl mb-3 sm:mb-4">
+                            Características
+                        </h2>
+                        <dl class="grid grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-4 text-xs sm:text-sm text-left">
+                            <dt class="text-charcoal/60">Acero:</dt>
+                            <dd class="font-medium text-charcoal">
+                                {cuchillo.acero}
+                            </dd>
+                            <dt class="text-charcoal/60">Cabo:</dt>
+                            <dd class="font-medium text-charcoal">
+                                {cuchillo.cabo}
+                            </dd>
+                            <dt class="text-charcoal/60">Terminación:</dt>
+                            <dd class="font-medium text-charcoal">
+                                {cuchillo.terminacion}
+                            </dd>
+                            {cuchillo.largo_total_cm && (
+                                <>
+                                    <dt class="text-charcoal/60">
+                                        Largo total:
+                                    </dt>
+                                    <dd class="font-medium text-charcoal">
+                                        {cuchillo.largo_total_cm} cm
+                                    </dd>
+                                </>
+                            )}
+                            {cuchillo.largo_hoja_cm && (
+                                <>
+                                    <dt class="text-charcoal/60">
+                                        Largo hoja:
+                                    </dt>
+                                    <dd class="font-medium text-charcoal">
+                                        {cuchillo.largo_hoja_cm} cm
+                                    </dd>
+                                </>
+                            )}
+                            {cuchillo.espesor_mm && (
+                                <>
+                                    <dt class="text-charcoal/60">Espesor:</dt>
+                                    <dd class="font-medium text-charcoal">
+                                        {cuchillo.espesor_mm} mm
+                                    </dd>
+                                </>
+                            )}
+                            {cuchillo.peso_g && (
+                                <>
+                                    <dt class="text-charcoal/60">Peso:</dt>
+                                    <dd class="font-medium text-charcoal">
+                                        {cuchillo.peso_g} g
+                                    </dd>
+                                </>
+                            )}
+                            {cuchillo.vaina && (
+                                <>
+                                    <dt class="text-charcoal/60">Vaina:</dt>
+                                    <dd class="font-medium text-charcoal">
+                                        {cuchillo.vaina}
+                                    </dd>
+                                </>
+                            )}
+                            <dt class="text-charcoal/60">Estado:</dt>
+                            <dd class="font-medium text-charcoal">
+                                {cuchillo.estado}
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener"
+                        class="inline-flex items-center gap-3 bg-cognac text-cream px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg active:scale-95"
+                    >
+                        <span>Cotizar por WhatsApp</span>
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cream/20 flex-shrink-0">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </span>
+                    </a>
+                </div>
             </div>
         </div>
     </main>
-
-    <Footer />
 </Layout>
